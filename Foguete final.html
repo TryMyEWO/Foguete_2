@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Galaxy Mission Control</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      padding: 2rem;
+      background-image: url('https://i.postimg.cc/YSt6PvXW/unnamed.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1, h2 {
+      margin: 0.5rem 0;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    input, select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    input, select {
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #000;
+      min-width: 150px;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    button {
+      background-color: #6ecdf2;
+      color: #000;
+      cursor: pointer;
+      transition: background 0.3s;
+      min-width: 150px;
+    }
+
+    button:hover {
+      background-color: #3fa1cc;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      max-width: 350px;
+      margin-bottom: 1rem;
+    }
+
+    li.success {
+      background-color: #0a0;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    li.success:hover {
+      background-color: #070;
+    }
+
+    #foguete {
+      position: fixed;
+      bottom: 12%;
+      left: calc(10% + 200px + 10px);
+      width: 100px;
+      transform-origin: center center;
+      transition: left 4s linear, bottom 4s linear, opacity 1s;
+      z-index: 3;
+      transform: rotate(45deg);
+    }
+
+    #planeta {
+      position: fixed;
+      bottom: 5%;
+      right: 10%;
+      width: 200px;
+      z-index: 2;
+    }
+
+    #fumaca {
+      position: fixed;
+      bottom: 10%;
+      left: calc(10% + 200px + 50px);
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 20%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(4px);
+    }
+
+    #confete-container {
+      position: fixed;
+      pointer-events: none;
+      z-index: 5;
+      width: 120px;
+      height: 120px;
+      overflow: visible;
+      display: none;
+    }
+
+    .confete {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: red;
+      opacity: 0.9;
+      border-radius: 50%;
+      animation-name: confete-fall;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes confete-fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(80px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #planeta {
+        width: 120px;
+        right: 5%;
+        bottom: 8%;
+      }
+      #foguete {
+        width: 70px;
+        left: calc(5% + 120px + 8px);
+        bottom: 15%;
+      }
+      #fumaca {
+        width: 70px;
+        height: 70px;
+        left: calc(5% + 120px + 30px);
+        bottom: 15%;
+      }
+      #confete-container {
+        width: 90px;
+        height: 90px;
+      }
+      .confete {
+        width: 6px;
+        height: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Galaxy Mission Control</h1>
+  </header>
+
+  <section>
+    <h2>Cadastro de Candidatos</h2>
+    <form id="formulario">
+      <input type="text" id="nome" placeholder="Nome" required />
+      <input type="number" id="idade" placeholder="Idade" min="1" max="120" required />
+      <select id="especialidade" required>
+        <option value="" disabled selected>Especialidade</option>
+        <option value="Piloto">Piloto</option>
+        <option value="Engenheiro">Engenheiro</option>
+        <option value="Biólogo">Biólogo</option>
+        <option value="Médico">Médico</option>
+      </select>
+      <button type="submit">Cadastrar</button>
+    </form>
+    <ul id="candidatos" title="Clique para remover"></ul>
+  </section>
+
+  <section>
+    <h2>Recursos para Missão</h2>
+    <form id="form-recursos">
+      <select id="recurso-nome" required>
+        <option value="" disabled selected>Selecione recurso</option>
+        <option value="Oxigênio">Oxigênio (mín 800)</option>
+        <option value="Combustível">Combustível (mín 1456)</option>
+        <option value="Alimento">Alimento (mín 1.8 por pessoa)</option>
+      </select>
+      <input type="number" id="recurso-quantidade" placeholder="Quantidade" min="1" required />
+      <button type="submit">Adicionar Recurso</button>
+    </form>
+    <ul id="lista-recursos" title="Clique para remover"></ul>
+  </section>
+
+  <section>
+    <h2>Simulação de Missão</h2>
+    <label for="pessoas">Número de pessoas:</label>
+    <input type="number" id="pessoas" min="1" />
+    <button id="botao-missao">Iniciar Missão</button>
+    <div id="resultado" class="conclusao"></div>
+  </section>
+
+  <!-- Imagens e efeitos -->
+  <img id="foguete" src="https://i.postimg.cc/BnPwPFhw/pngtree-cartoon-illustration-red-rocket-png-image-6515439.png" alt="Foguete" />
+  <div id="fumaca"></div>
+  <img id="planeta" src="https://i.postimg.cc/9Q8RKxyr/green-earth-planet-free-png.webp" alt="Planeta" />
+  <div id="confete-container"></div>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const lista = document.getElementById("candidatos");
+    const resultado = document.getElementById("resultado");
+    const foguete = document.getElementById("foguete");
+    const fumaca = document.getElementById("fumaca");
+    const formRecursos = document.getElementById("form-recursos");
+    const listaRecursos = document.getElementById("lista-recursos");
+    const botaoMissao = document.getElementById("botao-missao");
+    const planeta = document.getElementById("planeta");
+    const confeteContainer = document.getElementById("confete-container");
+    const pessoasInput = document.getElementById("pessoas");
+
+    let candidatos = [];
+    let recursos = [];
+
+    formulario.onsubmit = function (e) {
+      e.preventDefault();
+      const nome = document.getElementById("nome").value.trim();
+      const idade = parseInt(document.getElementById("idade").value);
+      const especialidade = document.getElementById("especialidade").value;
+
+      if (!nome || !idade || !especialidade) return;
+
+      const candidato = { nome, idade, especialidade };
+      candidatos.push(candidato);
+
+      const item = document.createElement("li");
+      item.textContent = `${nome} (${idade}) - ${especialidade}`;
+      item.className = "success";
+      item.title = "Clique para remover";
+      lista.appendChild(item);
+
+      item.addEventListener('click', () => {
+        const idx = candidatos.indexOf(candidato);
+        if (idx > -1) {
+          candidatos.splice(idx, 1);
+          lista.removeChild(item);
+        }
+      });
+
+      formulario.reset();
+    };
+
+    formRecursos.onsubmit = function (e) {
+      e.preventDefault();
+      const nome = document.getElementById("recurso-nome").value;
+      const quantidade = parseFloat(document.getElementById("recurso-quantidade").value);
+
+      if (!nome || isNaN(quantidade) || quantidade <= 0) return;
+
+      const recursoExistente = recursos.find(r => r.nome === nome);
+      if (recursoExistente) {
+        recursoExistente.quantidade += quantidade;
+        for(let li of listaRecursos.children) {
+          if(li.textContent.startsWith(nome)) {
+            li.textContent = `${nome} - ${recursoExistente.quantidade}`;
+            return;
+          }
+        }
+      } else {
+        const recurso = { nome, quantidade };
+        recursos.push(recurso);
+
+        const item = document.createElement("li");
+        item.textContent = `${nome} - ${quantidade}`;
+        item.className = "success";
+        item.title = "Clique para remover";
+        listaRecursos.appendChild(item);
+
+        item.addEventListener('click', () => {
+          const idx = recursos.indexOf(recurso);
+          if (idx > -1) {
+            recursos.splice(idx, 1);
+            listaRecursos.removeChild(item);
+          }
+        });
+      }
+
+      formRecursos.reset();
+    };
+
+    function criarConfete() {
+      confeteContainer.innerHTML = ''; // limpa confetes antigos
+      confeteContainer.style.display = 'block';
+
+      const cores = ['#ff0a54', '#ff477e', '#ff85a1', '#fbb1b1', '#f9bec7', '#fab8c4', '#f7cad0', '#fae0e4'];
+
+      for (let i = 0; i < 20; i++) {
+        const confete = document.createElement('div');
+        confete.classList.add('confete');
+        confete.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+        confete.style.left = Math.random() * 110 + 'px';
+        confete.style.top = Math.random() * 110 + 'px';
+        confete.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+        confete.style.animationDelay = (Math.random() * 0.5) + 's';
+
+        confeteContainer.appendChild(confete);
+      }
+
+      // Oculta o confete depois da animação
+      setTimeout(() => {
+        confeteContainer.style.display = 'none';
+      }, 3500);
+    }
+
+    function resetarFoguete() {
+      foguete.style.left = "calc(10% + 200px + 10px)";
+      foguete.style.bottom = "12%";
+      foguete.style.transform = "rotate(45deg)";
+      foguete.style.opacity = "1";
+
+      fumaca.style.opacity = 0;
+      confeteContainer.style.display = "none";
+      resultado.textContent = "";
+      foguete.src = "https://i.postimg.cc/BnPwPFhw/pngtree-cartoon-illustration-red-rocket-png-image-6515439.png";
+    }
+
+    botaoMissao.onclick = function() {
+      const pessoas = parseInt(pessoasInput.value);
+      if (isNaN(pessoas) || pessoas <= 0) {
+        resultado.textContent = "Informe o número de pessoas.";
+        return;
+      }
+      if (candidatos.length === 0) {
+        resultado.textContent = "Cadastre ao menos um candidato.";
+        return;
+      }
+      const oxigenio = recursos.find(r => r.nome.toLowerCase().includes("oxigênio") || r.nome.toLowerCase().includes("oxigenio"));
+      const combustivel = recursos.find(r => r.nome.toLowerCase().includes("combustível") || r.nome.toLowerCase().includes("combustivel"));
+      const alimento = recursos.find(r => r.nome.toLowerCase().includes("alimento"));
+      if (!oxigenio || !combustivel || !alimento) {
+        resultado.textContent = "Recursos insuficientes!";
+        return;
+      }
+      if (oxigenio.quantidade < 800 || combustivel.quantidade < 1456 || alimento.quantidade < pessoas * 1.8) {
+        resultado.textContent = "Recursos abaixo do mínimo necessário.";
+        return;
+      }
+
+      resultado.textContent = "Missão em andamento...";
+      fumaca.style.opacity = 1;
+
+      const planetaRect = planeta.getBoundingClientRect();
+      const fogueteRect = foguete.getBoundingClientRect();
+
+      const destinoLeft = planetaRect.left - fogueteRect.width / 2;
+
+      foguete.style.transition = "left 4s linear, opacity 1s";
+      foguete.style.left = destinoLeft + "px";
+
+      setTimeout(() => {
+        if (oxigenio.quantidade >= 800 && combustivel.quantidade >= 1456 && alimento.quantidade >= pessoas * 1.8) {
+          resultado.textContent = "Missão concluída com sucesso! 🚀🎉";
+
+          confeteContainer.style.left = foguete.style.left;
+          confeteContainer.style.bottom = foguete.style.bottom;
+          criarConfete();
+
+          foguete.style.opacity = "0"; // desaparece ao chegar no planeta
+        } else {
+          resultado.textContent = "Falha na missão. O foguete explodiu! 💥";
+          foguete.src = "https://i.imgur.com/fzksk4W.png";
+        }
+        fumaca.style.opacity = 0;
+        setTimeout(resetarFoguete, 4500);
+      }, 4100);
+    };
+
+    window.onload = resetarFoguete;
+  </script>
+</body>
+</html>
